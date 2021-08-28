@@ -1,3 +1,4 @@
 include ':simplebanner'
+include ':simplebanner'
 include ':app'
 rootProject.name = "SimpleBanner"

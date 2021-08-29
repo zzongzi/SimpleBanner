@@ -1,5 +1,6 @@
 package com.zz.simplebanner.utils.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -51,7 +52,11 @@ class ProgressDotView : View {
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         //获取相关属性
         initAttrs(context, attrs)
         //初始化画笔
@@ -83,16 +88,19 @@ class ProgressDotView : View {
         }
     }
 
+    @SuppressLint("CustomViewStyleable")
     private fun initAttrs(context: Context, attrs: AttributeSet?) {
-        val a = context.obtainStyledAttributes(attrs, R.styleable.ProgressDotView)
-        mRadius = a.getFloat(R.styleable.ProgressDotView_dotRadius, mRadius)
-        mRadius = dp2px(mRadius).toFloat()
-        mDotCount = a.getInt(R.styleable.ProgressDotView_dotCount, mDotCount)
-        mUnselectedColor = a.getColor(R.styleable.ProgressDotView_unSelectedColor, mUnselectedColor)
-        mSelectedColor = a.getColor(R.styleable.ProgressDotView_selectedColor, mSelectedColor)
-        mZoom = a.getFloat(R.styleable.ProgressDotView_circleZoom, mZoom)
-        mLeftCircleCanMovePosition = a.getFloat(R.styleable.ProgressDotView_leftCircleCanMovePosition,
-                mLeftCircleCanMovePosition)
+        val a = context.obtainStyledAttributes(attrs, R.styleable.SimpleBanner)
+        mRadius = dp2px(a.getFloat(R.styleable.SimpleBanner_dotRadius, mRadius))
+        mDotCount = a.getInt(R.styleable.SimpleBanner_dotCount, mDotCount)
+        mUnselectedColor =
+            a.getColor(R.styleable.SimpleBanner_unSelectedColor, mUnselectedColor)
+        mSelectedColor = a.getColor(R.styleable.SimpleBanner_selectedColor, mSelectedColor)
+        mZoom = a.getFloat(R.styleable.SimpleBanner_circleZoom, mZoom)
+        mLeftCircleCanMovePosition = a.getFloat(
+            R.styleable.SimpleBanner_leftCircleCanMovePosition,
+            mLeftCircleCanMovePosition
+        )
         a.recycle()
     }
 
@@ -147,25 +155,42 @@ class ProgressDotView : View {
 
         if (mProgress < mLeftCircleCanMovePosition) {
             //滑动一半之前 左圆点缩小mZoom (默认百分之40) 不移动
-            mLeftCircleRadius = changeCircle(0f, 0f, -mZoom / mLeftCircleCanMovePosition * mProgress, canvas)
+            mLeftCircleRadius =
+                changeCircle(0f, 0f, -mZoom / mLeftCircleCanMovePosition * mProgress, canvas)
             //记录此时左圆的X
             mLeftX = mStartX + 0f
         } else {
             //滑动mLeftCircleCanMovePosition之后 左圆点开始平移向右至右圆点圆心 且缩小至不可见
-            mLeftCircleRadius = changeCircle(mCircleCenterInterval / (1 - mLeftCircleCanMovePosition) * (mProgress - mLeftCircleCanMovePosition), 0f, -mZoom + (mZoom - 1) / (1 - mLeftCircleCanMovePosition) * (mProgress - mLeftCircleCanMovePosition), canvas)
+            mLeftCircleRadius = changeCircle(
+                mCircleCenterInterval / (1 - mLeftCircleCanMovePosition) * (mProgress - mLeftCircleCanMovePosition),
+                0f,
+                -mZoom + (mZoom - 1) / (1 - mLeftCircleCanMovePosition) * (mProgress - mLeftCircleCanMovePosition),
+                canvas
+            )
             //记录此时左圆的X
-            mLeftX = mStartX + mCircleCenterInterval / (1 - mLeftCircleCanMovePosition) * (mProgress - mLeftCircleCanMovePosition)
+            mLeftX =
+                mStartX + mCircleCenterInterval / (1 - mLeftCircleCanMovePosition) * (mProgress - mLeftCircleCanMovePosition)
 
         }
 
         if (mProgress < mLeftCircleCanMovePosition) {
             //滑动mLeftCircleCanMovePosition之前 右圆点从左圆点圆心处出发 从0放大到正常大小的(1-mZoom)(默认百分之60) 同时移动到右侧圆心处
-            mRightCircleRadius = changeCircle(mCircleCenterInterval / mLeftCircleCanMovePosition * mProgress, 0f, -1 + (1 - mZoom) / mLeftCircleCanMovePosition * mProgress, canvas)
+            mRightCircleRadius = changeCircle(
+                mCircleCenterInterval / mLeftCircleCanMovePosition * mProgress,
+                0f,
+                -1 + (1 - mZoom) / mLeftCircleCanMovePosition * mProgress,
+                canvas
+            )
             //记录此时右圆的X
             mRightX = mStartX + mCircleCenterInterval / mLeftCircleCanMovePosition * mProgress
         } else {
             //滑动mLeftCircleCanMovePosition之后 右圆点从正常大小的(1-mZoom)(默认百分之60)放大到正常大小
-            mRightCircleRadius = changeCircle(mCircleCenterInterval, 0f, -mZoom + mZoom / (1 - mLeftCircleCanMovePosition) * (mProgress - mLeftCircleCanMovePosition), canvas)
+            mRightCircleRadius = changeCircle(
+                mCircleCenterInterval,
+                0f,
+                -mZoom + mZoom / (1 - mLeftCircleCanMovePosition) * (mProgress - mLeftCircleCanMovePosition),
+                canvas
+            )
             //记录此时右圆的X
             mRightX = mStartX + mCircleCenterInterval
         }
@@ -175,9 +200,19 @@ class ProgressDotView : View {
         for (i in 0 until mDotCount) {
             //根据位置绘制不同颜色的圆点
             if ((i == mPosition && mProgress == 0f) || mPosition == i + 3) {//注意 i+3=3 若外部通过 page：2 0 1 2 0 来实现 0 1 2 界面的循环滑动 当从0往前滑到2时 因为设定了跳转 所以会出现3的情况
-                canvas.drawCircle(mRadius + i * mRadius * 2 + i * mInterval, mY, mRadius, mSelectedDotPaint)
+                canvas.drawCircle(
+                    mRadius + i * mRadius * 2 + i * mInterval,
+                    mY,
+                    mRadius,
+                    mSelectedDotPaint
+                )
             } else {
-                canvas.drawCircle(mRadius + i * mRadius * 2 + i * mInterval, mY, mRadius, mUnselectedDotPaint)
+                canvas.drawCircle(
+                    mRadius + i * mRadius * 2 + i * mInterval,
+                    mY,
+                    mRadius,
+                    mUnselectedDotPaint
+                )
             }
         }
     }
@@ -199,14 +234,24 @@ class ProgressDotView : View {
      * @param changeValueY 与起点圆心X轴坐标相比改变的Y值大小
      * @param changeProportionRadius 与初始圆的半径相比 改变的半径比例 初始为 0 若缩小百分之40 即为-0.4
      */
-    private fun changeCircle(changeValueX: Float, changeValueY: Float, changeProportionRadius: Float, canvas: Canvas): Float {
+    private fun changeCircle(
+        changeValueX: Float,
+        changeValueY: Float,
+        changeProportionRadius: Float,
+        canvas: Canvas
+    ): Float {
 
-        canvas.drawCircle(mStartX + changeValueX, mY + changeValueY, mRadius * (1 + changeProportionRadius), mSelectedDotPaint)
+        canvas.drawCircle(
+            mStartX + changeValueX,
+            mY + changeValueY,
+            mRadius * (1 + changeProportionRadius),
+            mSelectedDotPaint
+        )
 
         //返回此时圆的半径
         return mRadius * (1 + changeProportionRadius)
     }
 
     //dp2px
-    private fun dp2px(dpValue: Float) = (dpValue * resources.displayMetrics.density + 0.5f).toInt()
+    private fun dp2px(dpValue: Float) = (dpValue * resources.displayMetrics.density + 0.5f)
 }

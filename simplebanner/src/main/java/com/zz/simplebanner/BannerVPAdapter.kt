@@ -12,7 +12,11 @@ import com.bumptech.glide.Glide
  *    e-mail : 1140143252@qq.com
  *    date   : 2021/8/28 16:00
  */
-class BannerVPAdapter(private val mImageUrlList: List<String>, private val mOnClick: (position:Int) -> Unit, private val mImageScaleType:ImageView.ScaleType) :
+class BannerVPAdapter(
+    private val mImageUrlList: List<String>,
+    private val mOnClick: ((position: Int) -> Unit)?,
+    private val mImageScaleType: ImageView.ScaleType
+) :
     RecyclerView.Adapter<BannerVPAdapter.ImageHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageHolder {
@@ -24,14 +28,16 @@ class BannerVPAdapter(private val mImageUrlList: List<String>, private val mOnCl
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
 
         //设置scaleType
-        holder.bannerImage.scaleType=mImageScaleType
+        holder.bannerImage.scaleType = mImageScaleType
         //加载图片
-        Glide.with(holder.bannerImage.context).load(mImageUrlList[position]).into(holder.bannerImage)
+        Glide.with(holder.bannerImage.context).load(mImageUrlList[position])
+            .into(holder.bannerImage)
         //设置点击事件
         holder.bannerImage.setOnClickListener {
-            mOnClick(position)
+            mOnClick?.let { it -> it(position) }
         }
     }
+
 
     override fun getItemCount(): Int {
         return mImageUrlList.size
